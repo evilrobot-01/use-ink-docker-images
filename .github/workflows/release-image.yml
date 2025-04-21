@@ -8,6 +8,12 @@ on:
       - edited
       - prereleased
       - published
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to be used"
+        required: true
+        type: string
 env:
   IMAGE_NAME: useink/ci
 
@@ -16,7 +22,7 @@ jobs:
     name: Push Docker image to Docker Hub
     runs-on: ubuntu-latest
     timeout-minutes: 400
-    environment: master_and_tags
+#    environment: master_and_tags
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4
@@ -37,6 +43,16 @@ jobs:
           tags: |
             ${{ env.IMAGE_NAME }}:master
             ${{ env.IMAGE_NAME }}:latest
+
+      - name: Build and push Docker image from manual trigger
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./ci/Dockerfile
+          push: true
+          tags: |
+            ${{ env.IMAGE_NAME }}:${{ github.event.inputs.tag }}
 
       # Store the version, stripping any v-prefix
       - name: Write release version
