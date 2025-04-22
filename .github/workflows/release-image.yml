@@ -52,7 +52,7 @@ jobs:
           file: ./ci/Dockerfile
           push: true
           tags: |
-            ${{ env.IMAGE_NAME }}:${{ github.event.inputs.tag }}
+            ${{ secrets.DOCKERHUB_USER }}/useink:${{ github.event.inputs.tag }}
 
       # Store the version, stripping any v-prefix
       - name: Write release version
